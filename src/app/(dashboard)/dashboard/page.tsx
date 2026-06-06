@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { subDays, format } from "date-fns";
 import Link from "next/link";
-import type { Url } from "@prisma/client";
 import { cn } from "@/lib/utils";
 
 export default async function DashboardPage() {
@@ -147,7 +146,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="divide-y divide-border/40">
-              {recentLinks.map((link: Url & { _count: { clicks: number } }) => (
+              {recentLinks.map((link) => (
                 <div
                   key={link.id}
                   className="flex items-center justify-between gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0 group"
