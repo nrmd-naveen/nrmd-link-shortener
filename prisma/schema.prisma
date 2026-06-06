@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth.js v5 required tables ─────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts Account[]
+  sessions Session[]
+  urls     Url[]
+  tags     Tag[]
+  apiKeys  ApiKey[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── Core domain ─────────────────────────────────────────────────────────────
+
+model Url {
+  id      String @id @default(cuid())
+  shortId String @unique
+  url     String @db.Text
+
+  // Ownership — null means anonymous
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Metadata fetched from target page
+  title       String? @db.VarChar(512)
+  description String? @db.VarChar(1024)
+  favicon     String? @db.VarChar(512)
+
+  // Link controls
+  status     UrlStatus @default(ACTIVE)
+  password   String?   // bcrypt hash — null means no password
+  clickLimit Int?      // null = unlimited
+  expiresAt  DateTime? // null = never expires
+
+  // Anonymous-specific TTL (separate from expiresAt which is user-controlled)
+  isAnonymous   Boolean   @default(false)
+  anonExpiresAt DateTime? // set on creation, cleaned up by cron
+
+  // Custom OG override
+  ogTitle       String? @db.VarChar(512)
+  ogDescription String? @db.VarChar(1024)
+  ogImage       String? @db.VarChar(512)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clicks Click[]
+  tags   TagsOnUrls[]
+
+  @@index([userId])
+  @@index([shortId])
+  @@index([isAnonymous, anonExpiresAt])
+}
+
+enum UrlStatus {
+  ACTIVE
+  PAUSED
+  ARCHIVED
+  EXPIRED
+}
+
+model Click {
+  id    String @id @default(cuid())
+  urlId String
+
+  // Geo (from Vercel edge headers — no external service needed)
+  country   String? @db.VarChar(2)  // ISO 3166-1 alpha-2
+  city      String? @db.VarChar(128)
+  region    String? @db.VarChar(128)
+  latitude  String? @db.VarChar(16)
+  longitude String? @db.VarChar(16)
+
+  // Device / UA
+  device  String? @db.VarChar(32)  // mobile | desktop | tablet | bot
+  browser String? @db.VarChar(64)
+  os      String? @db.VarChar(64)
+
+  // Traffic source
+  referrer       String? @db.VarChar(1024)
+  referrerDomain String? @db.VarChar(256)
+
+  // Privacy-safe: we store a salted SHA-256 of IP, never raw IP
+  ipHash String? @db.VarChar(64)
+
+  createdAt DateTime @default(now())
+
+  url Url @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@index([urlId])
+  @@index([urlId, createdAt])
+  @@index([createdAt])
+}
+
+// ─── Tags ────────────────────────────────────────────────────────────────────
+
+model Tag {
+  id     String @id @default(cuid())
+  name   String @db.VarChar(64)
+  color  String @default("#6366f1") @db.VarChar(16) // hex color
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  urls TagsOnUrls[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+model TagsOnUrls {
+  urlId String
+  tagId String
+
+  url Url @relation(fields: [urlId], references: [id], onDelete: Cascade)
+  tag Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([urlId, tagId])
+}
+
+// ─── API Keys ─────────────────────────────────────────────────────────────────
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String    @db.VarChar(128)
+  keyHash    String    @unique @db.VarChar(64) // SHA-256 hash of the actual key
+  keyPreview String    @db.VarChar(12)         // first 12 chars shown in UI ("nrmd_" + 7)
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([keyHash])
+}
