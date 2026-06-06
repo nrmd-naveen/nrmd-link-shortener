@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 
-// Vercel Cron — runs every hour
-// vercel.json: { "crons": [{ "path": "/api/cron/cleanup", "schedule": "0 * * * *" }] }
+// Vercel Cron — runs daily at midnight UTC
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
