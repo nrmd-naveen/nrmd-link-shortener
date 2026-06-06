@@ -146,7 +146,7 @@ export default async function DashboardPage() {
             </div>
           ) : (
             <div className="divide-y divide-border/40">
-              {recentLinks.map((link) => (
+              {recentLinks.map((link: (typeof recentLinks)[number]) => (
                 <div
                   key={link.id}
                   className="flex items-center justify-between gap-3 py-3 sm:py-3.5 first:pt-0 last:pb-0 group"
