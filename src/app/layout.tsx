@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { CommandPalette } from "@/components/command-palette";
 import "./globals.css";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className="min-h-screen">
         <ThemeProvider>
           {children}
+          <CommandPalette />
           <Toaster richColors position="bottom-right" />
         </ThemeProvider>
       </body>

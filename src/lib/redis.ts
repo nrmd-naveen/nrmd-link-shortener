@@ -13,3 +13,10 @@ export const keys = {
   // Cached "not found" negative — prevents DB hit for bad IDs
   shortLinkNotFound: (shortId: string) => `sl:404:${shortId}`,
 } as const;
+
+// ─── Cache value types ────────────────────────────────────────────────────────
+
+export interface CachedLink {
+  url: string;
+  redirectType: number;
+}

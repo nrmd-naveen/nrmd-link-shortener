@@ -13,6 +13,7 @@ import {
 import { subDays, format } from "date-fns";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { ActivityFeed } from "@/components/dashboard/activity-feed";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -174,6 +175,16 @@ export default async function DashboardPage() {
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Activity Feed */}
+      <Card className="border-white/30 dark:border-white/10 animate-fade-in-up delay-400">
+        <CardHeader className="flex flex-row items-center justify-between px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4">
+          <CardTitle className="text-sm sm:text-base font-semibold">Recent Activity</CardTitle>
+        </CardHeader>
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+          <ActivityFeed />
         </CardContent>
       </Card>
 

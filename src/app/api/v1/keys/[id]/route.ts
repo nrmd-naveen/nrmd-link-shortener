@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { logAudit } from "@/lib/audit";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -17,5 +18,13 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
   if (!key) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   await prisma.apiKey.delete({ where: { id } });
+
+  logAudit({
+    userId: session.user.id,
+    action: "apikey.delete",
+    entityId: id,
+    entityType: "apikey",
+  }).catch(() => {});
+
   return new NextResponse(null, { status: 204 });
 }

@@ -2,15 +2,41 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { LinksList } from "@/components/dashboard/links-list";
 import { CreateLinkDialog } from "@/components/dashboard/create-link-dialog";
+import { UtmBuilder } from "@/components/dashboard/utm-builder";
+import { BulkShortenDialog } from "@/components/dashboard/bulk-shorten-dialog";
 
-export default async function LinksPage() {
+type SortField = "createdAt" | "updatedAt" | "clicks";
+type SortOrder = "asc" | "desc";
+
+interface SearchParams {
+  sort?: string;
+  order?: string;
+}
+
+export default async function LinksPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
   const session = await auth();
   const userId = session!.user.id;
+  const sp = await searchParams;
+
+  const sortField: SortField =
+    sp.sort === "updatedAt" ? "updatedAt" : sp.sort === "clicks" ? "clicks" : "createdAt";
+  const orderDir: SortOrder = sp.order === "asc" ? "asc" : "desc";
+
+  const orderBy =
+    sortField === "clicks"
+      ? ({ clicks: { _count: orderDir } } as const)
+      : sortField === "updatedAt"
+      ? ({ updatedAt: orderDir } as const)
+      : ({ createdAt: orderDir } as const);
 
   const [links, tags] = await Promise.all([
     prisma.url.findMany({
       where: { userId },
-      orderBy: { createdAt: "desc" },
+      orderBy,
       include: {
         tags: { include: { tag: true } },
         _count: { select: { clicks: true } },
@@ -31,7 +57,9 @@ export default async function LinksPage() {
             Track, manage and optimise your shortened URLs.
           </p>
         </div>
-        <div className="shrink-0">
+        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+          <UtmBuilder />
+          <BulkShortenDialog />
           <CreateLinkDialog tags={tags} />
         </div>
       </div>

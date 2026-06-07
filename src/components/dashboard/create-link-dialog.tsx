@@ -13,6 +13,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Plus, Loader2 } from "lucide-react";
 import type { $Enums } from "@prisma/client";
@@ -30,6 +37,7 @@ export function CreateLinkDialog({ tags }: { tags: TagShape[] }) {
   const [expiresAt, setExpiresAt] = useState("");
   const [clickLimit, setClickLimit] = useState("");
   const [password, setPassword] = useState("");
+  const [redirectType, setRedirectType] = useState("302");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   function toggleTag(id: string) {
@@ -43,7 +51,7 @@ export function CreateLinkDialog({ tags }: { tags: TagShape[] }) {
     setLoading(true);
     setError(null);
 
-    const body: Record<string, unknown> = { url };
+    const body: Record<string, unknown> = { url, redirectType: Number(redirectType) };
     if (keyword)          body.keyword   = keyword;
     if (expiresAt)        body.expiresAt = new Date(expiresAt).toISOString();
     if (clickLimit)       body.clickLimit = Number(clickLimit);
@@ -63,7 +71,7 @@ export function CreateLinkDialog({ tags }: { tags: TagShape[] }) {
       }
       setOpen(false);
       router.refresh();
-      setUrl(""); setKeyword(""); setExpiresAt(""); setClickLimit(""); setPassword(""); setSelectedTags([]);
+      setUrl(""); setKeyword(""); setExpiresAt(""); setClickLimit(""); setPassword(""); setRedirectType("302"); setSelectedTags([]);
     } catch {
       setError("Network error");
     } finally {
@@ -169,6 +177,20 @@ export function CreateLinkDialog({ tags }: { tags: TagShape[] }) {
               onChange={(e) => setPassword(e.target.value)}
               className="h-10 rounded-xl bg-background/50 border-border"
             />
+          </div>
+
+          {/* Redirect type */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-medium text-muted-foreground">Redirect type</Label>
+            <Select value={redirectType} onValueChange={(v) => { if (v) setRedirectType(v); }}>
+              <SelectTrigger className="h-10 rounded-xl bg-background/50 border-border w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="302">302 — Temporary (recommended)</SelectItem>
+                <SelectItem value="301">301 — Permanent</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Tags */}

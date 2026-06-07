@@ -4,6 +4,7 @@ import { randomBytes } from "crypto";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sha256 } from "@/lib/hash";
+import { logAudit } from "@/lib/audit";
 
 const createKeySchema = z.object({
   name: z.string().trim().min(1).max(128),
@@ -61,6 +62,15 @@ export async function POST(req: NextRequest) {
     },
     select: { id: true, name: true, keyPreview: true, createdAt: true },
   });
+
+  logAudit({
+    userId: session.user.id,
+    action: "apikey.create",
+    entityId: apiKey.id,
+    entityType: "apikey",
+    meta: { name: apiKey.name },
+    userAgent: req.headers.get("user-agent"),
+  }).catch(() => {});
 
   // Return the raw key ONCE — never stored again
   return NextResponse.json({ ...apiKey, key: rawKey }, { status: 201 });

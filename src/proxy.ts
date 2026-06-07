@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
+import type { CachedLink } from "@/lib/redis";
 
-// Use the Edge-compatible Redis client directly (no shared lib import — middleware runs on edge)
+// Use the Edge-compatible Redis client directly (no shared lib import — proxy runs on edge)
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL!,
   token: process.env.UPSTASH_REDIS_REST_TOKEN!,
@@ -22,7 +23,7 @@ const BYPASS_PREFIXES = [
   "/privacy",
 ];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Let non-redirect paths through
@@ -50,7 +51,7 @@ export async function middleware(req: NextRequest) {
   const notFoundKey = `sl:404:${shortId}`;
 
   const [cached, isNotFound] = await Promise.all([
-    redis.get<string>(cacheKey),
+    redis.get<CachedLink | string>(cacheKey),
     redis.get<number>(notFoundKey),
   ]);
 
@@ -59,7 +60,11 @@ export async function middleware(req: NextRequest) {
   }
 
   if (cached) {
-    return buildRedirect(req, cached, shortId);
+    // Handle both the new object format and legacy string format
+    if (typeof cached === "string") {
+      return buildRedirect(req, cached, shortId, 302);
+    }
+    return buildRedirect(req, cached.url, shortId, cached.redirectType);
   }
 
   // ── 2. Cache miss — fall through to the page route ────────────────────────
@@ -70,7 +75,8 @@ export async function middleware(req: NextRequest) {
 function buildRedirect(
   req: NextRequest,
   destination: string,
-  shortId: string
+  shortId: string,
+  redirectType: number
 ): NextResponse {
   // Preserve any query params appended by the visitor
   const dest = new URL(destination);
@@ -78,7 +84,8 @@ function buildRedirect(
     if (!dest.searchParams.has(key)) dest.searchParams.set(key, value);
   });
 
-  const res = NextResponse.redirect(dest, { status: 302 });
+  const status = redirectType === 301 ? 301 : 302;
+  const res = NextResponse.redirect(dest, { status });
   // Mark as edge-cached so analytics can detect it
   res.headers.set("x-nrmd-source", "edge-cache");
   res.headers.set("x-nrmd-id", shortId);

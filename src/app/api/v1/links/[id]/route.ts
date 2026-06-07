@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redis, keys } from "@/lib/redis";
 import { urlSchema, keywordSchema } from "@/lib/url";
+import { logAudit } from "@/lib/audit";
 
 const updateSchema = z.object({
   url: urlSchema.optional(),
@@ -15,6 +16,7 @@ const updateSchema = z.object({
   ogDescription: z.string().max(1024).nullable().optional(),
   ogImage: z.string().url().max(512).nullable().optional(),
   tagIds: z.array(z.string().cuid()).optional(),
+  redirectType: z.union([z.literal(301), z.literal(302)]).optional(),
 });
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -65,6 +67,7 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
   }
 
   const { tagIds, keyword, ...rest } = parsed.data;
+  const before = { url: link.url, status: link.status, shortId: link.shortId };
 
   // If keyword changed, verify new keyword doesn't conflict with another link
   if (keyword && keyword !== link.shortId) {
@@ -107,10 +110,21 @@ export async function PATCH(req: NextRequest, { params }: RouteParams) {
 
   // Re-warm if still active
   if (updated.status === "ACTIVE") {
-    await redis.set(keys.shortLink(updated.shortId), updated.url, {
-      ex: Number(process.env.REDIS_CACHE_TTL ?? 3600),
-    });
+    await redis.set(
+      keys.shortLink(updated.shortId),
+      { url: updated.url, redirectType: updated.redirectType },
+      { ex: Number(process.env.REDIS_CACHE_TTL ?? 3600) }
+    );
   }
+
+  logAudit({
+    userId: session.user.id,
+    action: "link.update",
+    entityId: id,
+    entityType: "link",
+    meta: { before, after: { url: updated.url, status: updated.status, shortId: updated.shortId } },
+    userAgent: req.headers.get("user-agent"),
+  }).catch(() => {});
 
   return NextResponse.json(updated);
 }
@@ -129,6 +143,14 @@ export async function DELETE(_req: NextRequest, { params }: RouteParams) {
 
   await prisma.url.delete({ where: { id } });
   await redis.del(keys.shortLink(link.shortId));
+
+  logAudit({
+    userId: session.user.id,
+    action: "link.delete",
+    entityId: id,
+    entityType: "link",
+    meta: { shortId: link.shortId },
+  }).catch(() => {});
 
   return new NextResponse(null, { status: 204 });
 }

@@ -8,13 +8,12 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  Cell,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Download } from "lucide-react";
 
 interface LinkOption { id: string; shortId: string; title: string | null; url: string }
 interface AnalyticsData {
@@ -106,6 +105,36 @@ export function AnalyticsDashboard({ links }: { links: LinkOption[] }) {
             </button>
           ))}
         </div>
+
+        {/* Export buttons */}
+        {selectedLinkId && (
+          <div className="flex gap-1.5">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 rounded-xl text-xs gap-1.5"
+              onClick={() => {
+                const range = days === "7" ? "7d" : days === "30" ? "30d" : "90d";
+                window.open(`/api/v1/analytics/${selectedLinkId}/export?format=csv&range=${range}`, "_blank");
+              }}
+            >
+              <Download className="h-3 w-3" />
+              CSV
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 rounded-xl text-xs gap-1.5"
+              onClick={() => {
+                const range = days === "7" ? "7d" : days === "30" ? "30d" : "90d";
+                window.open(`/api/v1/analytics/${selectedLinkId}/export?format=json&range=${range}`, "_blank");
+              }}
+            >
+              <Download className="h-3 w-3" />
+              JSON
+            </Button>
+          </div>
+        )}
       </div>
 
       {loading ? (

@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { redis, keys } from "@/lib/redis";
 import { recordClick } from "@/lib/analytics";
+import { logAudit } from "@/lib/audit";
 import { siteConfig } from "@/config/site";
 import { PasswordGate } from "@/components/redirect/password-gate";
 import { BrowserBarShorten } from "@/components/redirect/browser-bar-shorten";
@@ -46,6 +47,7 @@ export default async function SlugPage({ params, searchParams }: Props) {
       expiresAt: true,
       anonExpiresAt: true,
       clickLimit: true,
+      redirectType: true,
       _count: { select: { clicks: true } },
     },
   });
@@ -124,10 +126,19 @@ export default async function SlugPage({ params, searchParams }: Props) {
     request: { headers: reqHeaders },
   }).catch(() => {});
 
-  // Non-blocking — cache warm must not delay or block the redirect
-  redis.set(keys.shortLink(shortId), link.url, {
-    ex: siteConfig.redisCacheTtl,
+  logAudit({
+    action: "link.click",
+    entityId: link.id,
+    entityType: "link",
+    meta: { shortId },
   }).catch(() => {});
 
-  redirect(link.url);
+  // Non-blocking — cache warm must not delay or block the redirect
+  redis.set(
+    keys.shortLink(shortId),
+    { url: link.url, redirectType: link.redirectType },
+    { ex: siteConfig.redisCacheTtl }
+  ).catch(() => {});
+
+  redirect(link.url, link.redirectType === 301 ? "replace" : "push");
 }

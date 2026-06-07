@@ -17,11 +17,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
-  urls     Url[]
-  tags     Tag[]
-  apiKeys  ApiKey[]
+  accounts   Account[]
+  sessions   Session[]
+  urls       Url[]
+  tags       Tag[]
+  apiKeys    ApiKey[]
+  auditLogs  AuditLog[]
 }
 
 model Account {
@@ -77,10 +78,11 @@ model Url {
   favicon     String? @db.VarChar(512)
 
   // Link controls
-  status     UrlStatus @default(ACTIVE)
-  password   String?   // bcrypt hash — null means no password
-  clickLimit Int?      // null = unlimited
-  expiresAt  DateTime? // null = never expires
+  status       UrlStatus @default(ACTIVE)
+  password     String?   // bcrypt hash — null means no password
+  clickLimit   Int?      // null = unlimited
+  expiresAt    DateTime? // null = never expires
+  redirectType Int       @default(302)
 
   // Anonymous-specific TTL (separate from expiresAt which is user-controlled)
   isAnonymous   Boolean   @default(false)
@@ -184,4 +186,24 @@ model ApiKey {
 
   @@index([userId])
   @@index([keyHash])
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   @db.VarChar(64)
+  entityId   String?  @db.VarChar(128)
+  entityType String?  @db.VarChar(64)
+  meta       Json?
+  ipHash     String?  @db.VarChar(64)
+  userAgent  String?  @db.VarChar(256)
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityId, entityType])
+  @@index([createdAt])
 }

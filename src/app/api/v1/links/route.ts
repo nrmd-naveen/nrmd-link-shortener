@@ -7,6 +7,8 @@ import { resolveKeyword, uniqueRandomId } from "@/lib/short-id";
 import { anonRatelimit, authRatelimit } from "@/lib/rate-limit";
 import { siteConfig } from "@/config/site";
 import { addHours } from "date-fns";
+import { logAudit } from "@/lib/audit";
+import { hashIp } from "@/lib/hash";
 
 const createLinkSchema = z.object({
   url: urlSchema,
@@ -19,6 +21,7 @@ const createLinkSchema = z.object({
   ogTitle: z.string().max(512).optional(),
   ogDescription: z.string().max(1024).optional(),
   ogImage: z.string().url().max(512).optional(),
+  redirectType: z.union([z.literal(301), z.literal(302)]).optional().default(302),
 });
 
 export async function POST(req: NextRequest) {
@@ -73,6 +76,7 @@ export async function POST(req: NextRequest) {
     ogTitle,
     ogDescription,
     ogImage,
+    redirectType,
   } = parsed.data;
 
   // Authenticated-only controls
@@ -129,6 +133,7 @@ export async function POST(req: NextRequest) {
       expiresAt: expiresAt ? new Date(expiresAt) : null,
       clickLimit: clickLimit ?? null,
       password: hashedPassword,
+      redirectType,
       title: meta.title,
       description: meta.description,
       favicon: meta.favicon,
@@ -144,6 +149,16 @@ export async function POST(req: NextRequest) {
         : {}),
     },
   });
+
+  logAudit({
+    userId: session?.user?.id ?? null,
+    action: "link.create",
+    entityId: link.id,
+    entityType: "link",
+    meta: { shortId: link.shortId, url: link.url },
+    ipHash: ip !== "unknown" ? hashIp(ip) : null,
+    userAgent: req.headers.get("user-agent"),
+  }).catch(() => {});
 
   return NextResponse.json(
     {
@@ -170,6 +185,19 @@ export async function GET(req: NextRequest) {
   const search = searchParams.get("search") ?? undefined;
   const tagId = searchParams.get("tagId") ?? undefined;
   const status = searchParams.get("status") ?? undefined;
+  const sortRaw = searchParams.get("sort") ?? "createdAt";
+  const orderRaw = searchParams.get("order") ?? "desc";
+
+  const sortField = ["createdAt", "updatedAt", "clicks"].includes(sortRaw) ? sortRaw : "createdAt";
+  const orderDir = orderRaw === "asc" ? "asc" : "desc";
+
+  type SortOrder = "asc" | "desc";
+  const orderBy =
+    sortField === "clicks"
+      ? ({ clicks: { _count: orderDir as SortOrder } } as const)
+      : sortField === "updatedAt"
+      ? ({ updatedAt: orderDir as SortOrder } as const)
+      : ({ createdAt: orderDir as SortOrder } as const);
 
   const where = {
     userId: session.user.id,
@@ -189,7 +217,7 @@ export async function GET(req: NextRequest) {
   const [links, total] = await Promise.all([
     prisma.url.findMany({
       where,
-      orderBy: { createdAt: "desc" },
+      orderBy,
       skip: (page - 1) * limit,
       take: limit,
       include: {
