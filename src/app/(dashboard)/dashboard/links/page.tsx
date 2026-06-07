@@ -49,15 +49,15 @@ export default async function LinksPage({
   ]);
 
   return (
-    <div className="space-y-5 sm:space-y-6 max-w-5xl animate-fade-in-up">
-      <div className="flex items-start sm:items-center justify-between gap-3">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in-up">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold">Links</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             Track, manage and optimise your shortened URLs.
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+        <div className="flex items-center gap-2 flex-wrap">
           <UtmBuilder />
           <BulkShortenDialog />
           <CreateLinkDialog tags={tags} />

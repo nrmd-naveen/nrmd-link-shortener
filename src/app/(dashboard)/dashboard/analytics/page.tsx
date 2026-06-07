@@ -13,7 +13,7 @@ export default async function AnalyticsPage() {
   });
 
   return (
-    <div className="space-y-5 sm:space-y-6 max-w-5xl animate-fade-in-up">
+    <div className="space-y-5 sm:space-y-6 animate-fade-in-up">
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">Analytics</h1>
         <p className="mt-0.5 text-sm text-muted-foreground">

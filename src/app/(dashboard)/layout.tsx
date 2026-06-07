@@ -17,7 +17,9 @@ export default async function DashboardLayout({
       <DashboardSidebar />
       <div className="flex flex-1 flex-col min-w-0">
         <DashboardHeader user={session.user} />
-        <main className="flex-1 p-4 pb-28 lg:p-8 lg:pb-8">{children}</main>
+        <main className="flex-1 p-4 pb-28 lg:p-8 lg:pb-8">
+          <div className="mx-auto w-full max-w-5xl">{children}</div>
+        </main>
       </div>
       <MobileNav />
     </div>

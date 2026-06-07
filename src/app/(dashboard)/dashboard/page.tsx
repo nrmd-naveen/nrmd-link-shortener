@@ -70,9 +70,9 @@ export default async function DashboardPage() {
   ];
 
   return (
-    <div className="space-y-5 sm:space-y-7 max-w-5xl animate-fade-in-up">
+    <div className="space-y-5 sm:space-y-7 animate-fade-in-up">
       {/* Page header */}
-      <div className="flex items-start sm:items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold">Overview</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
@@ -83,12 +83,11 @@ export default async function DashboardPage() {
           href="/dashboard/links"
           className={cn(
             buttonVariants({ size: "sm" }),
-            "shrink-0 rounded-xl gap-1.5 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
+            "self-start sm:self-auto rounded-xl gap-1.5 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/25 active:scale-95"
           )}
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden sm:inline">Create link</span>
-          <span className="sm:hidden">New</span>
+          Create link
         </Link>
       </div>
 
