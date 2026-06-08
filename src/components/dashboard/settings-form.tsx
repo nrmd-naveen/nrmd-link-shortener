@@ -32,7 +32,7 @@ function AppearanceCard() {
           <Sun className="h-4 w-4 text-muted-foreground" />
           Appearance
         </CardTitle>
-        <CardDescription>Choose how nrmd.link looks for you.</CardDescription>
+        <CardDescription>Choose how NRMD Links looks for you.</CardDescription>
       </CardHeader>
       <CardContent className="px-6 pb-6">
         <div className="grid grid-cols-3 gap-3">
@@ -93,9 +93,9 @@ export function SettingsForm({ user }: Props) {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-6 pb-6">
-          <div className="flex items-center gap-5">
-            <div className="relative">
-              <Avatar className="h-16 w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <div className="relative shrink-0">
+              <Avatar className="h-14 w-14 sm:h-16 sm:w-16 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
                 <AvatarImage src={user.image ?? undefined} />
                 <AvatarFallback className="bg-primary/12 text-primary font-bold text-lg">
                   {initials}
@@ -105,17 +105,17 @@ export function SettingsForm({ user }: Props) {
                 <ShieldCheck className="h-3 w-3 text-white" />
               </div>
             </div>
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-base">{user.name ?? "—"}</p>
+            <div className="min-w-0 flex-1 space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="font-semibold text-base truncate">{user.name ?? "—"}</p>
                 <Badge
                   variant="outline"
-                  className="text-xs rounded-full px-2 py-0 bg-green-500/8 border-green-500/20 text-green-600"
+                  className="text-xs rounded-full px-2 py-0 bg-green-500/8 border-green-500/20 text-green-600 shrink-0"
                 >
                   Verified
                 </Badge>
               </div>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
+              <p className="text-sm text-muted-foreground truncate">{user.email}</p>
               <p className="text-xs text-muted-foreground/60">
                 Your email has been verified. You have full access.
               </p>

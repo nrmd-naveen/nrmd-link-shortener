@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShortenForm } from "@/components/shared/shorten-form";
@@ -26,9 +27,7 @@ export default function LandingPage() {
             href="/"
             className="flex items-center gap-2.5 font-heading font-bold text-[15px] tracking-tight"
           >
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
-              <Link2 className="h-[15px] w-[15px] text-primary-foreground" />
-            </div>
+            <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={28} height={28} className="rounded-lg" />
             {siteConfig.domain}
           </Link>
 
@@ -230,9 +229,7 @@ export default function LandingPage() {
       <footer className="mt-auto border-t border-border/40">
         <div className="mx-auto flex max-w-6xl flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0 px-5 sm:px-6 py-5 sm:py-6 text-xs text-muted-foreground/70">
           <div className="flex items-center gap-2">
-            <div className="flex h-5 w-5 items-center justify-center rounded-md bg-primary/10">
-              <Link2 className="h-3 w-3 text-primary" />
-            </div>
+            <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={20} height={20} className="rounded-md opacity-80" />
             <span>© {new Date().getFullYear()} {siteConfig.domain}</span>
           </div>
           <div className="flex gap-5">

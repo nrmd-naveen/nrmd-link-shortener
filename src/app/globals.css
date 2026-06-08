@@ -49,7 +49,7 @@
 /* ── Keyframes ─────────────────────────────────────────────── */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(22px); }
-  to   { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; }
 }
 @keyframes fade-in {
   from { opacity: 0; }
@@ -57,11 +57,11 @@
 }
 @keyframes scale-in {
   from { opacity: 0; transform: scale(0.93); }
-  to   { opacity: 1; transform: scale(1); }
+  to   { opacity: 1; }
 }
 @keyframes slide-in-left {
   from { opacity: 0; transform: translateX(-18px); }
-  to   { opacity: 1; transform: translateX(0); }
+  to   { opacity: 1; }
 }
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -83,10 +83,10 @@
 /* ── Custom utilities ───────────────────────────────────────── */
 @layer utilities {
   /* Entrance animations */
-  .animate-fade-in-up    { animation: fade-in-up  0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .animate-fade-in       { animation: fade-in     0.4s  ease-out both; }
-  .animate-scale-in      { animation: scale-in    0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .animate-slide-in-left { animation: slide-in-left 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-fade-in-up    { animation: fade-in-up  0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .animate-fade-in       { animation: fade-in     0.4s  ease-out backwards; }
+  .animate-scale-in      { animation: scale-in    0.35s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+  .animate-slide-in-left { animation: slide-in-left 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
 
   /* Looping animations */
   .animate-float       { animation: float       4s   ease-in-out infinite; }
@@ -124,27 +124,23 @@
   /* Glass surface — the core visual primitive */
   .glass {
     background: oklch(99% 0.006 285 / 65%);
-    backdrop-filter: blur(20px) saturate(1.8);
-    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(8px) saturate(1.5);
     border: 1px solid oklch(100% 0 0 / 55%);
     box-shadow:
       inset 0 1px 0 oklch(100% 0 0 / 70%),
       0 4px 24px oklch(42% 0.19 285 / 0.10),
       0 1px 6px  oklch(0% 0 0 / 0.05);
-    will-change: backdrop-filter;
   }
 
   /* Stronger glass (for sidebars, overlapping surfaces) */
   .glass-strong {
     background: oklch(99% 0.008 285 / 78%);
-    backdrop-filter: blur(32px) saturate(2);
-    -webkit-backdrop-filter: blur(32px) saturate(2);
+    backdrop-filter: blur(8px) saturate(1.5);
     border: 1px solid oklch(100% 0 0 / 60%);
     box-shadow:
       inset 0 1px 0 oklch(100% 0 0 / 80%),
       0 8px 40px oklch(42% 0.19 285 / 0.12),
       0 2px 8px  oklch(0% 0 0 / 0.06);
-    will-change: backdrop-filter;
   }
 
   /* Mesh gradient background */
@@ -180,9 +176,8 @@
   /* ── Dark mode overrides ─────────────────────────────────── */
 
   .dark .glass {
-    background: oklch(18% 0.026 285 / 72%);
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
+    background: oklch(18% 0.026 285 / 52%);
+    backdrop-filter: blur(8px) saturate(1.4);
     border: 1px solid oklch(100% 0 0 / 7%);
     box-shadow:
       inset 0 1px 0 oklch(100% 0 0 / 5%),
@@ -191,9 +186,8 @@
   }
 
   .dark .glass-strong {
-    background: oklch(20% 0.03 285 / 88%);
-    backdrop-filter: blur(28px) saturate(1.8);
-    -webkit-backdrop-filter: blur(28px) saturate(1.8);
+    background: oklch(20% 0.03 285 / 66%);
+    backdrop-filter: blur(8px) saturate(1.4);
     border: 1px solid oklch(100% 0 0 / 9%);
     box-shadow:
       inset 0 1px 0 oklch(100% 0 0 / 7%),
@@ -307,9 +301,9 @@
 
   --background:         oklch(12%   0.02  285);
   --foreground:         oklch(95%   0.01  285);
-  --card:               oklch(18%   0.024 285 / 78%);
+  --card:               oklch(18%   0.024 285 / 52%);
   --card-foreground:    oklch(95%   0.01  285);
-  --popover:            oklch(15%   0.02  285 / 96%);
+  --popover:            oklch(15%   0.02  285 / 65%);
   --popover-foreground: oklch(95%   0.01  285);
   --primary:            oklch(68%   0.22  285);
   --primary-foreground: oklch(10%   0.01  285);
@@ -355,23 +349,11 @@
   body {
     @apply text-foreground;
     background-color: var(--background);
-    min-height: 100svh;
-  }
-
-  /* Fixed gradient mesh — rendered as a separate layer so backdrop-filter
-     on glass children can composite correctly (background-attachment:fixed
-     breaks backdrop-filter on Chrome/Windows). */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    background-color: var(--background);
     background-image:
       radial-gradient(ellipse 90% 55% at 18% -10%, oklch(84% 0.11 280 / 0.22), transparent),
       radial-gradient(ellipse 65% 45% at 88%  4%,  oklch(80% 0.14 242 / 0.14), transparent),
       radial-gradient(ellipse 75% 65% at 48% 115%, oklch(86% 0.09 318 / 0.12), transparent);
+    min-height: 100svh;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -381,20 +363,14 @@
 
   /* Glass backdrop on shadcn cards */
   [data-slot="card"] {
-    backdrop-filter: blur(20px) saturate(1.6);
-    -webkit-backdrop-filter: blur(20px) saturate(1.6);
-    will-change: backdrop-filter;
+    backdrop-filter: blur(8px) saturate(1.4);
   }
 
-  /* Glass backdrop on floating surfaces */
-  [data-slot="dropdown-menu-content"],
-  [data-slot="popover-content"],
-  [data-slot="select-content"],
+  /* Glass backdrop on floating surfaces — dialog/alert use position:fixed directly so
+     backdrop-filter works; dropdown/select/popover blur is on their Positioner instead */
   [data-slot="dialog-content"],
   [data-slot="alert-dialog-content"] {
-    backdrop-filter: blur(28px) saturate(1.8);
-    -webkit-backdrop-filter: blur(28px) saturate(1.8);
-    will-change: backdrop-filter;
+    backdrop-filter: blur(8px) saturate(1.4);
   }
 
   /* Custom scrollbar */
@@ -430,11 +406,11 @@
   /* ── Dark mode base overrides ─────────────────────────────── */
 
   /* Dark body gradient — deep violet/indigo nebula mesh */
-  .dark body::before {
+  .dark body {
     background-image:
-      radial-gradient(ellipse 90% 55% at 18% -10%, oklch(36% 0.2  285 / 0.45), transparent),
-      radial-gradient(ellipse 65% 45% at 88%  4%,  oklch(30% 0.17 240 / 0.32), transparent),
-      radial-gradient(ellipse 75% 65% at 48% 115%, oklch(28% 0.15 320 / 0.25), transparent);
+      radial-gradient(ellipse 90% 55% at 18% -10%, oklch(36% 0.2  285 / 0.65), transparent),
+      radial-gradient(ellipse 65% 45% at 88%  4%,  oklch(30% 0.17 240 / 0.48), transparent),
+      radial-gradient(ellipse 75% 65% at 48% 115%, oklch(28% 0.15 320 / 0.38), transparent);
   }
 
   /* Dark scrollbar */

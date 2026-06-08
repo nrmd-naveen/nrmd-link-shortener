@@ -1,5 +1,5 @@
 export const siteConfig = {
-  name: "nrmd.link",
+  name: "NRMD Links",
   description: "The fastest way to shorten URLs — no login required.",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://nrmd.link",
   domain: process.env.NEXT_PUBLIC_DOMAIN ?? "nrmd.link",

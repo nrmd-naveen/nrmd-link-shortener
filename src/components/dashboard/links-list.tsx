@@ -249,8 +249,8 @@ export function LinksList({ initialLinks, tags }: Props) {
         </div>
       ) : (
         <div className="glass rounded-2xl overflow-hidden">
-          {/* Table header */}
-          <div className="grid grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/20 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+          {/* Table header — hidden on mobile, shown on sm+ */}
+          <div className="hidden sm:grid sm:grid-cols-[auto_1fr_auto_auto_auto_auto] gap-4 px-5 py-3 border-b border-white/20 text-xs font-medium text-muted-foreground uppercase tracking-wide">
             <div className="flex items-center">
               <input
                 type="checkbox"
@@ -271,7 +271,7 @@ export function LinksList({ initialLinks, tags }: Props) {
               <div
                 key={link.id}
                 className={cn(
-                  "group grid grid-cols-[auto_1fr_auto_auto_auto_auto] items-center gap-4 px-5 py-4 hover:bg-black/2 transition-colors",
+                  "group flex items-center gap-3 px-5 py-4 hover:bg-black/2 transition-colors sm:grid sm:grid-cols-[auto_1fr_auto_auto_auto_auto] sm:gap-4",
                   selected.has(link.id) && "bg-primary/4"
                 )}
               >
@@ -286,7 +286,7 @@ export function LinksList({ initialLinks, tags }: Props) {
                 </div>
 
                 {/* Link info */}
-                <div className="min-w-0 space-y-0.5">
+                <div className="min-w-0 flex-1 space-y-0.5">
                   <div className="flex items-center gap-2 flex-wrap">
                     <a
                       href={`${siteConfig.url}/${link.shortId}`}
@@ -383,6 +383,13 @@ export function LinksList({ initialLinks, tags }: Props) {
                     >
                       <DropdownMenuItem
                         className="cursor-pointer"
+                        onClick={() => handleCopy(link.shortId)}
+                      >
+                        <Copy className="h-4 w-4" />
+                        Copy link
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer"
                         render={
                           <a
                             href={`${siteConfig.url}/${link.shortId}`}
@@ -453,7 +460,7 @@ export function LinksList({ initialLinks, tags }: Props) {
 
       {/* Bulk action bar */}
       {someSelected && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
+        <div className="fixed bottom-24 lg:bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in-up">
           <div className="glass-strong rounded-2xl border-white/30 px-4 py-3 flex items-center gap-3 shadow-xl">
             <span className="text-sm font-medium text-muted-foreground">
               {selected.size} selected

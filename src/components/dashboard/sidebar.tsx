@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -30,11 +31,10 @@ export function DashboardSidebar() {
         href="/"
         className="flex h-16 items-center gap-2.5 border-b border-white/20 px-5"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
-          <Link2 className="h-[15px] w-[15px] text-primary-foreground" />
-        </div>
+        <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={28} height={28} className="rounded-lg" />
         <span className="font-heading font-bold text-[15px] tracking-tight">
-          {siteConfig.domain}
+          {/* {siteConfig.domain} */}
+          NRMD Links
         </span>
       </Link>
 

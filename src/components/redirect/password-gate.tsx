@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Lock, Link2 } from "lucide-react";
+import { Lock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 interface Props { shortId: string; error?: string }
@@ -37,10 +38,8 @@ export function PasswordGate({ shortId, error }: Props) {
           href="/"
           className="flex items-center gap-2 text-sm font-heading font-bold text-white/60 hover:text-white/90 transition-colors"
         >
-          <div className="flex h-6 w-6 items-center justify-center rounded-md bg-[oklch(42%_0.19_285)] shadow-md shadow-primary/30">
-            <Link2 className="h-3.5 w-3.5 text-white" />
-          </div>
-          nrmd.link
+          <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={24} height={24} className="rounded-md" />
+          NRMD Links
         </Link>
         <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/25 ml-8">
           Secure Gateway
@@ -117,7 +116,7 @@ export function PasswordGate({ shortId, error }: Props) {
       </div>
 
       <p className="absolute bottom-10 text-[10px] text-white/20">
-        © {new Date().getFullYear()} nrmd.link · Privacy · Terms
+        © {new Date().getFullYear()} NRMD Links · Privacy · Terms
       </p>
     </div>
   );

@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Bell, LogOut, Settings, User, Link2 } from "lucide-react";
+import { Bell, LogOut, Settings, User } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -33,10 +34,8 @@ export function DashboardHeader({ user }: Props) {
         href="/"
         className="flex items-center gap-2 font-heading font-bold text-[15px] tracking-tight lg:hidden"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary shadow-md shadow-primary/30">
-          <Link2 className="h-[15px] w-[15px] text-primary-foreground" />
-        </div>
-        nrmd.link
+        <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={28} height={28} className="rounded-lg" />
+        NRMD Links
       </Link>
 
       <div className="hidden lg:block" />

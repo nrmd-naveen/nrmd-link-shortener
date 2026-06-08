@@ -23,7 +23,7 @@ export default async function ApiKeysPage() {
       <div>
         <h1 className="text-xl sm:text-2xl font-bold">API Keys</h1>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          Programmatically manage links, track analytics, and integrate nrmd.link
+          Programmatically manage links, track analytics, and integrate NRMD Links
           directly into your high-performance applications.
         </p>
       </div>

@@ -191,7 +191,7 @@ export default async function DashboardPage() {
       <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground/50 pb-2">
         <Link href="/privacy" className="hover:text-muted-foreground transition-colors">Privacy</Link>
         <Link href="/terms" className="hover:text-muted-foreground transition-colors">Terms</Link>
-        <span>© {new Date().getFullYear()} nrmd.link</span>
+        <span>© {new Date().getFullYear()} NRMD Links</span>
       </div>
     </div>
   );

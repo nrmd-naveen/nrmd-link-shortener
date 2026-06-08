@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { LoginCard } from "@/components/auth/login-card";
-import { Link2, ShieldCheck, ArrowLeft } from "lucide-react";
+import { ShieldCheck, ArrowLeft } from "lucide-react";
 
 export default async function LoginPage() {
   const session = await auth();
@@ -25,10 +26,8 @@ export default async function LoginPage() {
             href="/"
             className="flex items-center gap-2 text-sm font-heading font-bold text-foreground/80 hover:text-foreground transition-colors"
           >
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary shadow-sm shadow-primary/30">
-              <Link2 className="h-3.5 w-3.5 text-primary-foreground" />
-            </div>
-            {process.env.NEXT_PUBLIC_DOMAIN ?? "nrmd.link"}
+            <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={24} height={24} className="rounded-md" />
+            NRMD Links
           </Link>
           <Link
             href="/"

@@ -34,8 +34,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "nrmd.link — URL Shortener",
-    template: "%s | nrmd.link",
+    default: "NRMD Links — URL Shortener",
+    template: "%s | NRMD Links",
   },
   description:
     "The fastest URL shortener. No login required. Type nrmd.link/https://… in your address bar.",
