@@ -38,10 +38,19 @@ export const metadata: Metadata = {
     template: "%s | NRMD Links",
   },
   description:
-    "The fastest URL shortener. No login required. Type nrmd.link/https://… in your address bar.",
+    "The fastest URL shortener. No login required. Type nrmd.site/https://… in your address bar.",
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://nrmd.link"
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://nrmd.site"
   ),
+  icons: {
+    icon: [
+      { url: "/favicon/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/favicon/apple-touch-icon.png",
+  },
+  manifest: "/favicon/site.webmanifest",
 };
 
 export default function RootLayout({
