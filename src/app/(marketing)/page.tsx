@@ -28,7 +28,7 @@ export default function LandingPage() {
             className="flex items-center gap-2.5 font-heading font-bold text-[15px] tracking-tight"
           >
             <Image src="/Logo_nrmd_link.png" alt="NRMD Links" width={28} height={28} className="rounded-lg" />
-            {siteConfig.domain}
+            NRMD Links
           </Link>
 
           <nav className="hidden md:flex items-center gap-0.5">
